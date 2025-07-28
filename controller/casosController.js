@@ -1,18 +1,12 @@
-let casos = [
-  { id: "1", titulo: "Roubo de carro", status: "em investigação" },
-  { id: "2", titulo: "Furto de loja", status: "encerrado" }
-];
-
+let casos = [];
 
 function getAllCasos() {
   return casos;
 }
 
-
 function getCasoById(id) {
   return casos.find(caso => caso.id === id);
 }
-
 
 function createCaso(caso) {
   casos.push(caso);
@@ -28,12 +22,10 @@ function updateCaso(id, dadosAtualizados) {
   return null;
 }
 
-
 function deleteCaso(id) {
   const index = casos.findIndex(caso => caso.id === id);
   if (index !== -1) {
-    const removido = casos.splice(index, 1);
-    return removido[0];
+    return casos.splice(index, 1)[0];
   }
   return null;
 }

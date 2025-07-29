@@ -1,32 +1,51 @@
 const { v4: uuidv4 } = require('uuid');
-const agentesRepository = require('../repository/agentesRepository');
+const agentesRepository = require('../repositories/agentesRepository');
 
-exports.getAllAgentes = (req, res) => {
-  res.json(agentesRepository.getAll());
+const getAllAgentes = (req, res) => {
+  const agentes = agentesRepository.findAll();
+  res.json(agentes);
 };
 
-exports.getAgenteById = (req, res) => {
-  const agente = agentesRepository.getById(req.params.id);
+const getAgenteById = (req, res) => {
+  const agente = agentesRepository.findById(req.params.id);
   if (!agente) return res.status(404).json({ error: 'Agente não encontrado' });
   res.json(agente);
 };
 
-exports.createAgente = (req, res) => {
-  const { nome, especialidade } = req.body;
-  const novoAgente = { id: uuidv4(), nome, especialidade };
-  agentesRepository.add(novoAgente);
+const createAgente = (req, res) => {
+  const { nome, dataDeIncorporacao, cargo } = req.body;
+  if (!nome || !dataDeIncorporacao || !cargo) {
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+  }
+  const novoAgente = {
+    id: uuidv4(),
+    nome,
+    dataDeIncorporacao,
+    cargo,
+  };
+  agentesRepository.create(novoAgente);
   res.status(201).json(novoAgente);
 };
 
-exports.updateAgente = (req, res) => {
-  const { nome, especialidade } = req.body;
-  const updated = agentesRepository.update(req.params.id, { nome, especialidade });
-  if (!updated) return res.status(404).json({ error: 'Agente não encontrado' });
-  res.json(updated);
+const updateAgente = (req, res) => {
+  const { id } = req.params;
+  const dados = req.body;
+  const atualizado = agentesRepository.update(id, dados);
+  if (!atualizado) return res.status(404).json({ error: 'Agente não encontrado' });
+  res.json(atualizado);
 };
 
-exports.deleteAgente = (req, res) => {
-  const success = agentesRepository.remove(req.params.id);
-  if (!success) return res.status(404).json({ error: 'Agente não encontrado' });
-  res.status(204).end();
+const deleteAgente = (req, res) => {
+  const { id } = req.params;
+  const deletado = agentesRepository.deleteById(id);
+  if (!deletado) return res.status(404).json({ error: 'Agente não encontrado' });
+  res.status(204).send();
+};
+
+module.exports = {
+  getAllAgentes,
+  getAgenteById,
+  createAgente,
+  updateAgente,
+  deleteAgente,
 };

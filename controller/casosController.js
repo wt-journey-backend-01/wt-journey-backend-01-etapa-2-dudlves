@@ -1,32 +1,57 @@
 const { v4: uuidv4 } = require('uuid');
-const casosRepository = require('../repository/casosRepository');
+const casosRepository = require('../repositories/casosRepository');
+const agentesRepository = require('../repositories/agentesRepository');
 
-exports.getAllCasos = (req, res) => {
-  res.json(casosRepository.getAll());
+const getAllCasos = (req, res) => {
+  const casos = casosRepository.findAll();
+  res.json(casos);
 };
 
-exports.getCasoById = (req, res) => {
-  const caso = casosRepository.getById(req.params.id);
+const getCasoById = (req, res) => {
+  const caso = casosRepository.findById(req.params.id);
   if (!caso) return res.status(404).json({ error: 'Caso não encontrado' });
   res.json(caso);
 };
 
-exports.createCaso = (req, res) => {
-  const { titulo, descricao } = req.body;
-  const novoCaso = { id: uuidv4(), titulo, descricao };
-  casosRepository.add(novoCaso);
+const createCaso = (req, res) => {
+  const { titulo, descricao, status, agente_id } = req.body;
+  if (!titulo || !descricao || !status || !agente_id) {
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+  }
+
+  const agenteExiste = agentesRepository.findById(agente_id);
+  if (!agenteExiste) {
+    return res.status(404).json({ error: 'Agente vinculado não encontrado' });
+  }
+
+  const novoCaso = {
+    id: uuidv4(),
+    titulo,
+    descricao,
+    status,
+    agente_id,
+  };
+  casosRepository.create(novoCaso);
   res.status(201).json(novoCaso);
 };
 
-exports.updateCaso = (req, res) => {
-  const { titulo, descricao } = req.body;
-  const updated = casosRepository.update(req.params.id, { titulo, descricao });
-  if (!updated) return res.status(404).json({ error: 'Caso não encontrado' });
-  res.json(updated);
+const updateCaso = (req, res) => {
+  const { id } = req.params;
+  const atualizado = casosRepository.update(id, req.body);
+  if (!atualizado) return res.status(404).json({ error: 'Caso não encontrado' });
+  res.json(atualizado);
 };
 
-exports.deleteCaso = (req, res) => {
-  const success = casosRepository.remove(req.params.id);
-  if (!success) return res.status(404).json({ error: 'Caso não encontrado' });
-  res.status(204).end();
+const deleteCaso = (req, res) => {
+  const deletado = casosRepository.deleteById(req.params.id);
+  if (!deletado) return res.status(404).json({ error: 'Caso não encontrado' });
+  res.status(204).send();
+};
+
+module.exports = {
+  getAllCasos,
+  getCasoById,
+  createCaso,
+  updateCaso,
+  deleteCaso,
 };

@@ -1,130 +1,150 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 8 créditos restantes para usar o sistema de feedback AI.
+Você tem 7 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para dudlves:
 
-Nota final: **13.5/100**
+Nota final: **50.4/100**
 
-# Feedback para dudlves 🚔💻
+# Feedback do seu desafio API REST - Departamento de Polícia 🚓🚀
 
-Olá, dudlves! Antes de tudo, parabéns por ter mergulhado nesse desafio complexo de criar uma API REST para o Departamento de Polícia! 🎉💪 Construir uma aplicação com múltiplos endpoints, validações, e organização modular não é fácil, e você já deu passos importantes nessa direção.
-
----
-
-## 🎯 O que você já mandou bem!
-
-- Seu arquivo `server.js` está bem estruturado e configurado, com as rotas de `/agentes` e `/casos` devidamente importadas e usadas. Isso é fundamental para que sua API funcione corretamente.
-- A organização das rotas em arquivos separados (`routes/agentesRoutes.js` e `routes/casosRoutes.js`) está correta e segue boas práticas.
-- Nos repositórios (`repositories/agentesRepository.js` e `repositories/casosRepository.js`), você implementou corretamente a manipulação dos arrays em memória, com métodos para adicionar, buscar, atualizar e remover elementos. Isso mostra que você entendeu a camada de dados em memória.
-- Você implementou respostas de erro para payloads mal formatados (status 400) em algumas situações, o que é um ponto positivo.
-- Você já usou UUID nas dependências, o que é ótimo para garantir IDs únicos (embora ainda tenha alguns ajustes a fazer nisso).
-- A documentação Swagger está integrada no seu `server.js`, o que é um diferencial para APIs REST.
+Olá, dudlves! Tudo bem? 😊 Antes de mais nada, parabéns pelo esforço e por ter avançado bastante nesse desafio importante de construir uma API RESTful completa com Node.js e Express! 🎉 Você já tem uma base muito boa, e vamos juntos lapidar seu código para deixá-lo ainda mais robusto e alinhado com as boas práticas.
 
 ---
 
-## 🕵️‍♂️ O que precisa de atenção e como avançar
+## 🎯 O que você mandou muito bem
 
-### 1. Ausência dos arquivos `agentesController.js` e `casosController.js`
+- **Estruturação das rotas:** Seu `server.js` está configurado corretamente para usar as rotas de agentes e casos, e você organizou as rotas em arquivos separados (`routes/agentesRoutes.js` e `routes/casosRoutes.js`). Isso é ótimo, pois facilita a manutenção e escalabilidade.  
+- **Uso dos repositories:** Você implementou os repositórios para agentes e casos (`repositories/agentesRepository.js` e `repositories/casosRepository.js`) com as funções básicas de CRUD usando arrays em memória. Isso é exatamente o que o desafio pedia para armazenar os dados temporariamente.  
+- **Swagger para documentação:** A inclusão do Swagger é um diferencial muito bacana! Isso mostra que você pensou na documentação da API, o que é essencial para APIs profissionais.  
+- **Status codes corretos em várias operações:** Vi que você já está retornando status 400 para payloads incorretos e 404 para recursos não encontrados, o que é fundamental para uma API RESTful bem construída!  
+- **Implementação dos métodos PUT para atualização completa:** Você já tem o PUT funcionando para atualizar agentes e casos, o que é um passo importante para o controle total dos recursos.  
+- **Criação e leitura funcionando:** Os endpoints para criar e listar agentes e casos estão funcionando bem, o que é a base para qualquer API.  
 
-Esse é o ponto mais crítico que encontrei! Ao analisar seu projeto, percebi que os arquivos:
+Além disso, você já começou a trabalhar nos bônus, como filtros e ordenação, o que é super legal! 🎖️ Isso mostra que você está buscando ir além do básico.
 
-- `controllers/agentesController.js`
-- `controllers/casosController.js`
+---
 
-**não existem no seu repositório.**
+## 🔎 Pontos que merecem sua atenção para melhorar (vamos destrinchar juntos)
 
-Sem esses arquivos, seus endpoints não têm a lógica para processar as requisições. As rotas estão definidas e apontando para funções como `agentesController.getAllAgentes`, mas essas funções não estão implementadas.
+### 1. **Ausência dos controllers para agentes e casos**
 
-Isso explica por que vários testes e funcionalidades relacionadas a criação, leitura, atualização e exclusão de agentes e casos falharam. Sem controladores, o Express não sabe o que fazer ao receber as requisições.
+Ao analisar seu projeto, percebi que os arquivos `controllers/agentesController.js` e `controllers/casosController.js` **não existem**. Isso é um ponto crucial!  
 
-**Como resolver?**  
-Você deve criar esses arquivos e implementar as funções que controlam o fluxo da requisição, chamando os métodos dos repositórios, validando dados, e retornando respostas HTTP corretas.
+Por quê?  
+As rotas (`routes/agentesRoutes.js` e `routes/casosRoutes.js`) estão configuradas para chamar funções do controller, como `agentesController.getAllAgentes` ou `casosController.createCaso`, mas sem esses arquivos e funções implementadas, seu servidor não sabe o que fazer quando essas rotas forem acessadas.  
 
-Exemplo básico de como começar o `controllers/agentesController.js`:
+Isso explica porque várias operações importantes, como PATCH (atualização parcial) e DELETE, não funcionam – porque os controladores que deveriam orquestrar essas ações não estão implementados.  
+
+**Como corrigir?**  
+Crie os arquivos `controllers/agentesController.js` e `controllers/casosController.js` e implemente as funções que suas rotas estão esperando. Por exemplo, no `agentesController.js`:
 
 ```js
 const agentesRepository = require('../repositories/agentesRepository');
-const { v4: uuidv4, validate: isUuid } = require('uuid');
 
-exports.getAllAgentes = (req, res) => {
-  const agentes = agentesRepository.getAll();
+function getAllAgentes(req, res) {
+  const agentes = agentesRepository.findAll();
   res.status(200).json(agentes);
-};
+}
 
-exports.getAgenteById = (req, res) => {
+function getAgenteById(req, res) {
   const { id } = req.params;
-  if (!isUuid(id)) {
-    return res.status(400).json({ error: 'ID inválido. Use UUID.' });
-  }
-  const agente = agentesRepository.getById(id);
+  const agente = agentesRepository.findById(id);
   if (!agente) {
-    return res.status(404).json({ error: 'Agente não encontrado.' });
+    return res.status(404).json({ error: 'Agente não encontrado' });
   }
   res.status(200).json(agente);
-};
+}
 
-// Continue implementando createAgente, updateAgente, deleteAgente...
+// Continue implementando createAgente, updateAgente, patchAgente, deleteAgente
+
+module.exports = {
+  getAllAgentes,
+  getAgenteById,
+  // exporte as outras funções aqui
+};
 ```
 
-Esse padrão deve ser seguido para todos os métodos que você declarou nas rotas.
+Esse padrão deve ser repetido para os casos também.
 
-**Recomendo fortemente assistir este vídeo para entender melhor a arquitetura MVC e como organizar controllers, rotas e repositórios:**  
-▶️ https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
+👉 Recomendo fortemente que você assista a este vídeo para entender como organizar rotas, controllers e repositories no Express.js:  
+https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
 
 ---
 
-### 2. Validação dos IDs como UUID (Penalidade detectada)
+### 2. **Falta do método PATCH para atualização parcial**
 
-Você declarou a dependência do pacote `uuid`, mas os IDs usados no seu código para agentes e casos **não estão sendo validados nem gerados como UUIDs**. Isso causa penalidades e pode gerar confusão na manipulação dos dados.
+Vi que seu código implementa o método PUT para atualização completa (`router.put('/:id', ...)`), mas não há nenhuma rota ou controller para o método PATCH, que é importante para atualizações parciais.  
 
-**Por que isso é importante?**  
-UUIDs são identificadores únicos universalmente reconhecidos, o que evita colisões e facilita a validação.
+O método PATCH é diferente do PUT porque ele atualiza apenas os campos que o cliente enviar, sem sobrescrever tudo. Isso é um requisito esperado no seu desafio e está faltando.  
 
-**Dica para resolver:**  
-- Use `uuidv4()` para gerar IDs ao criar agentes e casos.
-- Use `validate()` do pacote `uuid` para validar IDs recebidos nas rotas.
-
-Exemplo para gerar ID ao criar um agente:
+**Como implementar?**  
+No arquivo `routes/agentesRoutes.js` e `routes/casosRoutes.js`, adicione:
 
 ```js
-const { v4: uuidv4 } = require('uuid');
-
-exports.createAgente = (req, res) => {
-  const { nome, matricula, ... } = req.body;
-  // Valide os dados aqui
-  const novoAgente = {
-    id: uuidv4(),
-    nome,
-    matricula,
-    // outros campos
-  };
-  agentesRepository.add(novoAgente);
-  res.status(201).json(novoAgente);
-};
+router.patch('/:id', agentesController.patchAgente);
 ```
 
-Para validar o ID recebido:
+E no controller, crie a função `patchAgente` que atualiza parcialmente o agente, validando os dados recebidos e retornando status apropriados.
+
+---
+
+### 3. **Validações insuficientes e problemas com campos específicos**
+
+Seu código permite algumas situações que não deveriam acontecer, como:
+
+- Registrar um agente com `dataDeIncorporacao` em formato inválido ou no futuro.  
+- Atualizar o ID do agente ou do caso (que deve ser imutável).  
+- Atualizar o status do caso para valores que não são `'aberto'` ou `'solucionado'`.  
+
+Esses pontos são importantes para garantir a integridade dos dados da sua API.
+
+**Como melhorar?**  
+No controller, antes de criar ou atualizar um recurso, valide os dados do payload. Por exemplo, para validar `dataDeIncorporacao`:
 
 ```js
-const { validate: isUuid } = require('uuid');
-
-if (!isUuid(req.params.id)) {
-  return res.status(400).json({ error: 'ID inválido. Use UUID.' });
+function isValidDate(dateString) {
+  // Verifica se está no formato YYYY-MM-DD e se não é uma data futura
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) return false;
+  const date = new Date(dateString);
+  const now = new Date();
+  return date <= now;
 }
 ```
 
-Para aprofundar, veja o guia oficial do pacote `uuid` e este vídeo que explica validação e geração de IDs:  
-📚 https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
-📚 https://expressjs.com/pt-br/guide/routing.html
+E ao atualizar, bloqueie mudanças no campo `id`:
+
+```js
+if (updatedAgente.id && updatedAgente.id !== id) {
+  return res.status(400).json({ error: 'Não é permitido alterar o ID do agente.' });
+}
+```
+
+Para o `status` do caso, valide se o valor está entre os permitidos:
+
+```js
+const validStatus = ['aberto', 'solucionado'];
+if (updatedCaso.status && !validStatus.includes(updatedCaso.status)) {
+  return res.status(400).json({ error: 'Status inválido. Deve ser "aberto" ou "solucionado".' });
+}
+```
+
+Essas validações devem estar presentes tanto na criação quanto na atualização (PUT e PATCH).
+
+Para aprender mais sobre validação e tratamento de erros, veja:  
+https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_  
+https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400
 
 ---
 
-### 3. Organização da Estrutura de Diretórios
+### 4. **Estrutura de diretórios e nomes de pastas**
 
-Seu projeto está quase correto, mas notei que a pasta `controller/` está no singular, quando o esperado é `controllers/` no plural. Isso pode causar confusão e prejudicar a escalabilidade do projeto.
+Na sua estrutura, notei que você tem uma pasta chamada `controller` (no singular), mas o esperado é `controllers` (plural), conforme o padrão do desafio e da comunidade. Isso pode causar confusão e até erros ao importar os arquivos, além de fugir da arquitetura MVC que você está tentando seguir.  
 
-Veja a estrutura esperada:
+**Sugestão:** Renomeie a pasta para `controllers` e garanta que os arquivos `agentesController.js` e `casosController.js` estejam dentro dela.  
+
+Assim:
 
 ```
 ├── controllers/
@@ -132,137 +152,84 @@ Veja a estrutura esperada:
 │   └── casosController.js
 ```
 
-Mas no seu projeto:
+Esse detalhe é importante para manter seu projeto organizado e facilitar a manutenção.  
 
-```
-├── controller/
-│   ├── agentesController.js (não existe)
-│   └── casosController.js (não existe)
-```
-
-**Por que isso importa?**  
-Seguir a arquitetura proposta ajuda a manter o projeto organizado, facilita a colaboração e evita erros de importação.
-
-**Recomendo assistir esse vídeo para entender a arquitetura MVC aplicada ao Node.js:**  
-▶️ https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
+Para entender melhor a arquitetura MVC aplicada em Node.js, recomendo:  
+https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
 
 ---
 
-### 4. Implementação dos Métodos HTTP PUT e PATCH
+### 5. **Filtros, ordenação e mensagens de erro customizadas (Bônus)**
 
-Você implementou as rotas para `PUT` e `PATCH` em agentes e casos, mas sem os controladores, a lógica para atualizar os dados não existe.
+Você já começou a implementar filtros e ordenação, o que é ótimo! Porém, percebi que os filtros não estão funcionando corretamente e as mensagens de erro ainda são genéricas.  
 
-Além disso, é importante implementar validações específicas para cada método:
-
-- **PUT** deve atualizar o recurso por completo e validar que todos os campos obrigatórios estão presentes.
-- **PATCH** deve atualizar parcialmente e validar somente os campos enviados.
-
-Exemplo de validação para PUT (simplificado):
+Para melhorar, implemente query params para filtrar, por exemplo, casos por status:
 
 ```js
-if (!nome || !matricula) {
-  return res.status(400).json({ error: 'Campos obrigatórios faltando para atualização completa.' });
-}
-```
-
----
-
-### 5. Tratamento de Erros e Status Codes
-
-Você já iniciou o tratamento de erros, mas sem os controladores não há como garantir que os status HTTP estejam corretos para todas as operações.
-
-Lembre-se sempre de:
-
-- Retornar **201 CREATED** ao criar um recurso.
-- Retornar **204 NO CONTENT** ao deletar com sucesso.
-- Retornar **400 BAD REQUEST** para payloads inválidos.
-- Retornar **404 NOT FOUND** para IDs inexistentes.
-
-Exemplo para deletar um agente:
-
-```js
-exports.deleteAgente = (req, res) => {
-  const { id } = req.params;
-  if (!isUuid(id)) {
-    return res.status(400).json({ error: 'ID inválido.' });
-  }
-  const sucesso = agentesRepository.remove(id);
-  if (!sucesso) {
-    return res.status(404).json({ error: 'Agente não encontrado.' });
-  }
-  res.status(204).send();
-};
-```
-
----
-
-### 6. Bônus: Filtros, Ordenação e Mensagens de Erro Customizadas
-
-Vi que você tentou implementar filtros (como por status de caso), mas sem os controladores, essa funcionalidade não está completa.
-
-Para implementar filtros e ordenação, você deve:
-
-- Receber parâmetros via `req.query`.
-- Aplicar filtros nos dados retornados pelo repositório.
-- Retornar os dados filtrados e ordenados.
-
-Exemplo básico de filtro:
-
-```js
-exports.getAllCasos = (req, res) => {
+router.get('/', (req, res) => {
   const { status } = req.query;
-  let casos = casosRepository.getAll();
-
+  let resultados = casosRepository.findAll();
   if (status) {
-    casos = casos.filter(c => c.status === status);
+    resultados = resultados.filter(caso => caso.status === status);
   }
-
-  res.status(200).json(casos);
-};
+  res.json(resultados);
+});
 ```
 
----
+E crie mensagens de erro personalizadas para facilitar o entendimento do usuário da API.  
 
-## 📚 Recursos recomendados para você aprofundar:
-
-- **Arquitetura MVC e organização de projetos Node.js:**  
-  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
-
-- **Roteamento no Express.js:**  
-  https://expressjs.com/pt-br/guide/routing.html
-
-- **Validação e geração de UUID:**  
-  https://www.npmjs.com/package/uuid  
-  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_
-
-- **Tratamento de erros e status HTTP:**  
-  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400  
-  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404
-
-- **Manipulação de arrays em JavaScript:**  
-  https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI
+Quer aprender mais sobre isso? Veja:  
+https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404  
+https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400
 
 ---
 
-## 📝 Resumo rápido dos pontos para focar
+## 💡 Dicas extras para você arrasar na próxima versão
 
-- [ ] **Criar os arquivos `controllers/agentesController.js` e `controllers/casosController.js` com toda a lógica dos endpoints.**
-- [ ] **Gerar e validar IDs usando UUID para agentes e casos.**
-- [ ] **Corrigir a estrutura de diretórios, renomeando `controller/` para `controllers/`.**
-- [ ] **Implementar validações completas para os métodos HTTP (POST, PUT, PATCH).**
-- [ ] **Garantir o retorno correto dos status HTTP para cada operação.**
-- [ ] **Implementar filtros, ordenação e mensagens de erro customizadas nos controladores.**
+- Sempre que criar ou atualizar um recurso, valide todos os campos obrigatórios e seus formatos.  
+- Separe bem a lógica da rota, do controller e do repository para que seu código fique limpo e fácil de testar.  
+- Implemente o método PATCH para atualizações parciais, isso é um diferencial e ajuda muito na usabilidade da API.  
+- Não permita alterações nos campos que não devem ser alterados, como o `id` dos agentes e casos.  
+- Use mensagens de erro claras e status HTTP corretos para cada situação.  
 
 ---
 
-## Finalizando 🚀
+## 📌 Resumo rápido dos pontos para focar
 
-dudlves, seu projeto tem uma base muito boa, e com esses ajustes fundamentais você vai destravar várias funcionalidades importantes! Lembre-se que a arquitetura modular (com rotas, controladores e repositórios) é a espinha dorsal da sua API, e sem os controladores, o servidor não sabe como responder às requisições.
+- [ ] Criar e implementar os arquivos `controllers/agentesController.js` e `controllers/casosController.js` com todas as funções esperadas.  
+- [ ] Implementar o método PATCH para atualização parcial nos controllers e rotas.  
+- [ ] Adicionar validações rigorosas para campos como `dataDeIncorporacao`, `status` do caso, e impedir alteração do `id`.  
+- [ ] Corrigir a estrutura de pastas para usar `controllers` (plural) ao invés de `controller`.  
+- [ ] Aprimorar filtros e ordenação, e criar mensagens de erro personalizadas para melhorar a experiência da API.  
 
-Continue focado, você está no caminho certo! Se precisar, volte aos vídeos e documentação recomendados para reforçar os conceitos. Estou aqui torcendo pelo seu sucesso! 💙👊
+---
 
-Abraço e até a próxima revisão!  
-Seu Code Buddy 🤖✨
+## 🚀 Conclusão
+
+Você está no caminho certo, dudlves! Seu projeto já tem uma base sólida e com alguns ajustes importantes vai ficar bem alinhado com as melhores práticas de desenvolvimento de APIs RESTful. Não desanime com as dificuldades, pois elas são ótimas oportunidades para aprender e crescer.  
+
+Continue explorando, validando seus dados e organizando seu código com clareza. Se precisar, volte aos recursos que recomendei aqui para reforçar seu aprendizado. Estou aqui torcendo pela sua evolução e sucesso! 💪✨
+
+---
+
+Se quiser, posso ajudar a montar juntos os controllers ou revisar seu código para que fique redondinho! Só chamar! 😉
+
+Abraços e até a próxima! 👊👨‍💻👩‍💻
+
+---
+
+# Recursos recomendados para você:
+
+- [Arquitetura MVC em Node.js - Organização de Código](https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH)  
+- [Validação de Dados em APIs Node.js/Express](https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_)  
+- [Status HTTP 400 - Bad Request (MDN)](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400)  
+- [Status HTTP 404 - Not Found (MDN)](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404)  
+- [Express.js Routing - Documentação Oficial](https://expressjs.com/pt-br/guide/routing.html)  
+- [Manipulação de Arrays em JavaScript](https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI)  
+
+---
+
+Vamos juntos construir uma API cada vez mais profissional! 🚀🌟
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 

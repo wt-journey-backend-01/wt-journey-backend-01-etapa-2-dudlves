@@ -1,71 +1,32 @@
-const casosRepository = require('../repositories/casosRepository');
 const { v4: uuidv4 } = require('uuid');
+const casosRepository = require('../repository/casosRepository');
 
-function getAllCasos(req, res) {
-  const casos = casosRepository.findAll();
-  res.json(casos);
-}
+exports.getAllCasos = (req, res) => {
+  res.json(casosRepository.getAll());
+};
 
-function getCasoById(req, res) {
-  const { id } = req.params;
-  const caso = casosRepository.findById(id);
-  if (!caso) {
-    return res.status(404).json({ message: "Caso não encontrado" });
-  }
+exports.getCasoById = (req, res) => {
+  const caso = casosRepository.getById(req.params.id);
+  if (!caso) return res.status(404).json({ error: 'Caso não encontrado' });
   res.json(caso);
-}
+};
 
-function createCaso(req, res) {
-  const { titulo, descricao, status, agente_id } = req.body;
-  if (!titulo || !descricao || !status || !agente_id) {
-    return res.status(400).json({ message: "Campos obrigatórios faltando" });
-  }
-  if (!['aberto', 'solucionado'].includes(status)) {
-    return res.status(400).json({ message: "Status inválido" });
-  }
-  const newCaso = {
-    id: uuidv4(),
-    titulo,
-    descricao,
-    status,
-    agente_id,
-  };
-  casosRepository.create(newCaso);
-  res.status(201).json(newCaso);
-}
+exports.createCaso = (req, res) => {
+  const { titulo, descricao } = req.body;
+  const novoCaso = { id: uuidv4(), titulo, descricao };
+  casosRepository.add(novoCaso);
+  res.status(201).json(novoCaso);
+};
 
-function updateCaso(req, res) {
-  const { id } = req.params;
-  const { titulo, descricao, status, agente_id } = req.body;
-  const caso = casosRepository.findById(id);
-  if (!caso) {
-    return res.status(404).json({ message: "Caso não encontrado" });
-  }
-  if (!titulo || !descricao || !status || !agente_id) {
-    return res.status(400).json({ message: "Campos obrigatórios faltando" });
-  }
-  if (!['aberto', 'solucionado'].includes(status)) {
-    return res.status(400).json({ message: "Status inválido" });
-  }
-  const updatedCaso = { id, titulo, descricao, status, agente_id };
-  casosRepository.update(updatedCaso);
-  res.json(updatedCaso);
-}
+exports.updateCaso = (req, res) => {
+  const { titulo, descricao } = req.body;
+  const updated = casosRepository.update(req.params.id, { titulo, descricao });
+  if (!updated) return res.status(404).json({ error: 'Caso não encontrado' });
+  res.json(updated);
+};
 
-function deleteCaso(req, res) {
-  const { id } = req.params;
-  const caso = casosRepository.findById(id);
-  if (!caso) {
-    return res.status(404).json({ message: "Caso não encontrado" });
-  }
-  casosRepository.remove(id);
-  res.status(204).send();
-}
-
-module.exports = {
-  getAllCasos,
-  getCasoById,
-  createCaso,
-  updateCaso,
-  deleteCaso,
+exports.deleteCaso = (req, res) => {
+  const success = casosRepository.remove(req.params.id);
+  if (!success) return res.status(404).json({ error: 'Caso não encontrado' });
+  res.status(204).end();
 };

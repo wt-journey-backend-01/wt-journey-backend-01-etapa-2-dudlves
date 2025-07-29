@@ -1,44 +1,23 @@
-const agentes = [];
+let agentes = [];
 
-function findAll() {
-  return agentes;
-}
+exports.getAll = () => agentes;
 
-function findById(id) {
-  return agentes.find(agente => agente.id === id);
-}
+exports.getById = (id) => agentes.find(a => a.id === id);
 
-function create(agente) {
+exports.add = (agente) => {
   agentes.push(agente);
   return agente;
-}
+};
 
-function update(id, dados) {
-  const index = agentes.findIndex(agente => agente.id === id);
-  
-  if (index === -1) {
-    return null;
-  }
-
-  agentes[index] = Object.assign({}, agentes[index], dados); 
+exports.update = (id, newData) => {
+  const index = agentes.findIndex(a => a.id === id);
+  if (index === -1) return null;
+  agentes[index] = { ...agentes[index], ...newData };
   return agentes[index];
-}
+};
 
-function remove(id) {
-  const index = agentes.findIndex(agente => agente.id === id);
-
-  if (index === -1) {
-    return false;
-  }
-
-  agentes.splice(index, 1);
-  return true;
-}
-
-module.exports = {
-  findAll,
-  findById,
-  create,
-  update,
-  remove
+exports.remove = (id) => {
+  const initialLength = agentes.length;
+  agentes = agentes.filter(a => a.id !== id);
+  return agentes.length < initialLength;
 };

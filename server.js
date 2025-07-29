@@ -3,17 +3,14 @@ const app = express();
 const PORT = 3000;
 
 const agentesRouter = require('./routes/agentesRoutes');
-const casosRoutes = require('./routes/casosRoutes');
-const setupSwagger = require('./docs/swagger');
-const errorHandler = require('./utils/errorHandler');
+const casosRouter = require('./routes/casosRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./docs/swagger');
 
 app.use(express.json());
 app.use('/agentes', agentesRouter);
-app.use('/casos', casosRoutes);
-
-setupSwagger(app);
-
-app.use(errorHandler);
+app.use('/casos', casosRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.listen(PORT, () => {
   console.log(`Servidor do Departamento de Polícia rodando em http://localhost:${PORT}`);

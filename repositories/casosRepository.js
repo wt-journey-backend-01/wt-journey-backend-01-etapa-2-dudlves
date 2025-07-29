@@ -1,36 +1,23 @@
-const casos = [];
+let casos = [];
 
-function findAll() {
-  return casos;
-}
+exports.getAll = () => casos;
 
-function findById(id) {
-  return casos.find(caso => caso.id === id);
-}
+exports.getById = (id) => casos.find(c => c.id === id);
 
-function create(caso) {
+exports.add = (caso) => {
   casos.push(caso);
-}
+  return caso;
+};
 
-function update(updatedCaso) {
-  const index = casos.findIndex(c => c.id === updatedCaso.id);
-  if (index !== -1) {
-    casos[index] = updatedCaso;
-  }
-}
-
-function remove(id) {
+exports.update = (id, newData) => {
   const index = casos.findIndex(c => c.id === id);
-  if (index !== -1) {
-    casos.splice(index, 1);
-  }
-}
+  if (index === -1) return null;
+  casos[index] = { ...casos[index], ...newData };
+  return casos[index];
+};
 
-module.exports = {
-  findAll,
-  findById,
-  create,
-  update,
-  remove,
-
+exports.remove = (id) => {
+  const initialLength = casos.length;
+  casos = casos.filter(c => c.id !== id);
+  return casos.length < initialLength;
 };

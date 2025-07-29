@@ -1,1 +1,28 @@
+# Node modules
+node_modules/
+
+# Arquivos de log
+*.log
+
+# Variáveis de ambiente
+.env
+
+# Diretórios do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Cache
+.nyc_output
+coverage/
+.cache/
+dist/
+build/
+
+# Editor específico
+.vscode/
+.idea/
+*.swp
+
+# Testes temporários
+*.test.js.snap
 

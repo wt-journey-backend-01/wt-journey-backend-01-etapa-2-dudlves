@@ -1,46 +1,58 @@
+const agentesRepository = require('../repositories/agentesRepository');
+const { v4: uuidv4 } = require('uuid');
 
 function getAllAgentes(req, res) {
-  res.json([{ id: "1", nome: "Agente Teste" }]);
-}
-
-function createAgente(req, res) {
-  const novoAgente = req.body;
-  const agenteCriado = agentesRepository.create(novoAgente);
-  res.status(201).json(agenteCriado);
+  const agentes = agentesRepository.findAll();
+  res.json(agentes);
 }
 
 function getAgenteById(req, res) {
-  const id = req.params.id;
+  const { id } = req.params;
   const agente = agentesRepository.findById(id);
-
   if (!agente) {
-    return res.status(404).json({ mensagem: "Agente não encontrado." });
+    return res.status(404).json({ message: "Agente não encontrado" });
   }
-
   res.json(agente);
 }
 
-function updateAgente(req, res) {
-  const id = req.params.id;
-  const dadosAtualizados = req.body;
-
-  const agenteAtualizado = agentesRepository.update(id, dadosAtualizados);
-  if (!agenteAtualizado) {
-    return res.status(404).json({ mensagem: "Agente não encontrado." });
+function createAgente(req, res) {
+  const { nome, dataDeIncorporacao, cargo } = req.body;
+  if (!nome || !dataDeIncorporacao || !cargo) {
+    return res.status(400).json({ message: "Campos obrigatórios faltando" });
   }
+  const newAgente = {
+    id: uuidv4(),
+    nome,
+    dataDeIncorporacao,
+    cargo,
+  };
+  agentesRepository.create(newAgente);
+  res.status(201).json(newAgente);
+}
 
-  res.json(agenteAtualizado);
+function updateAgente(req, res) {
+  const { id } = req.params;
+  const { nome, dataDeIncorporacao, cargo } = req.body;
+  const agente = agentesRepository.findById(id);
+  if (!agente) {
+    return res.status(404).json({ message: "Agente não encontrado" });
+  }
+  if (!nome || !dataDeIncorporacao || !cargo) {
+    return res.status(400).json({ message: "Campos obrigatórios faltando" });
+  }
+  const updatedAgente = { id, nome, dataDeIncorporacao, cargo };
+  agentesRepository.update(updatedAgente);
+  res.json(updatedAgente);
 }
 
 function deleteAgente(req, res) {
-  const id = req.params.id;
-
-  const removido = agentesRepository.remove(id);
-  if (!removido) {
-    return res.status(404).json({ mensagem: "Agente não encontrado." });
+  const { id } = req.params;
+  const agente = agentesRepository.findById(id);
+  if (!agente) {
+    return res.status(404).json({ message: "Agente não encontrado" });
   }
-
-  res.status(204).send(); 
+  agentesRepository.remove(id);
+  res.status(204).send();
 }
 
 module.exports = {
@@ -48,5 +60,5 @@ module.exports = {
   getAgenteById,
   createAgente,
   updateAgente,
-  deleteAgente
+  deleteAgente,
 };
